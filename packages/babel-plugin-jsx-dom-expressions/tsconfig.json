@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "target": "es2016",
+    "sourceMap": true,
+    "declaration": true,
+    "declarationMap": true,
+    "noEmitOnError": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "jsx": "react",
+    "composite": true,
+    "noEmit": false,
+    "baseUrl": "src",
+    "outDir": "lib"
+  },
+  "exclude": [
+    "node_modules",
+    "lib"
+  ]
+}

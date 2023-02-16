@@ -1,4 +1,4 @@
-import * as t from "@babel/types";
+import { NodePath, TransformResult, TransformInfo, t } from "../types";
 import { decode } from "html-entities";
 import {
   Aliases,
@@ -32,13 +32,13 @@ import {
 } from "../shared/utils";
 import { transformNode } from "../shared/transform";
 
-export function transformElement(path, info) {
+export function transformElement(path: NodePath, info: TransformInfo) {
   let tagName = getTagName(path.node),
     config = getConfig(path),
     wrapSVG = info.topLevel && tagName != "svg" && SVGElements.has(tagName),
     voidTag = VoidElements.indexOf(tagName) > -1,
     isCustomElement = tagName.indexOf("-") > -1,
-    results = {
+    results: TransformResult = {
       template: `<${tagName}`,
       decl: [],
       exprs: [],

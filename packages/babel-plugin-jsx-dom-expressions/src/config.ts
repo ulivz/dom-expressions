@@ -1,4 +1,6 @@
-export default {
+import { PluginOptions } from "./types";
+
+export const PLUGIN_OPTIONS: PluginOptions = {
   moduleName: "dom",
   generate: "dom",
   hydratable: false,

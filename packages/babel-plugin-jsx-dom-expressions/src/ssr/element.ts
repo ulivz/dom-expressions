@@ -1,4 +1,5 @@
 import * as t from "@babel/types";
+import { NodePath } from "../types";
 import { decode } from "html-entities";
 import {
   BooleanAttributes,
@@ -268,7 +269,7 @@ function normalizeAttributes(path) {
   return attributes;
 }
 
-function transformAttributes(path, results, info) {
+function transformAttributes(path: NodePath, results, info) {
   const tagName = getTagName(path.node),
     isSVG = SVGElements.has(tagName),
     hasChildren = path.node.children.length > 0,

@@ -1,4 +1,6 @@
-import * as t from "@babel/types";
+
+import { t, } from "babel-shared";
+import type { NodePath, TransformResult, TransformInfo } from "../types";
 import { transformElement as transformElementDOM } from "../dom/element";
 import { createTemplate as createTemplateDOM } from "../dom/template";
 import { transformElement as transformElementSSR } from "../ssr/element";
@@ -19,7 +21,7 @@ import {
 import transformComponent from "./component";
 import transformFragmentChildren from "./fragment";
 
-export function transformJSX(path) {
+export function transformJSX(path: NodePath<t.JSXElement | t.JSXFragment>) {
   const config = getConfig(path);
   const replace = transformThis(path);
   const result = transformNode(
@@ -36,15 +38,15 @@ export function transformJSX(path) {
   path.replaceWith(replace(template(path, result, false)));
 }
 
-export function transformThis(path) {
-  let thisId;
+export function transformThis(path: NodePath) {
+  let thisId: t.Identifier;
   path.traverse({
     ThisExpression(path) {
       thisId || (thisId = path.scope.generateUidIdentifier("self$"));
       path.replaceWith(thisId);
     }
   });
-  return node => {
+  return (node: t.Node) => {
     if (thisId) {
       let parent = path.getStatementParent();
       const decl = t.variableDeclaration("const", [
@@ -56,7 +58,7 @@ export function transformThis(path) {
   };
 }
 
-export function transformNode(path, info = {}) {
+export function transformNode(path: NodePath, info: TransformInfo = {}) {
   const config = getConfig(path);
   const node = path.node;
   let staticValue;
@@ -75,7 +77,7 @@ export function transformNode(path, info = {}) {
           : staticValue.toString()
         : trimWhitespace(node.extra.raw);
     if (!text.length) return null;
-    const results = {
+    const results: TransformResult = {
       template: config.generate === "ssr" ? text : escapeBackticks(text),
       decl: [],
       exprs: [],
@@ -89,7 +91,7 @@ export function transformNode(path, info = {}) {
   } else if (t.isJSXExpressionContainer(node)) {
     if (t.isJSXEmptyExpression(node.expression)) return null;
     if (
-      !isDynamic(path.get("expression"), {
+      !isDynamic(path.get("expression") as NodePath, {
         checkMember: true,
         checkTags: !!info.componentChild,
         native: !info.componentChild
@@ -101,7 +103,7 @@ export function transformNode(path, info = {}) {
       config.wrapConditionals &&
       config.generate !== "ssr" &&
       (t.isLogicalExpression(node.expression) || t.isConditionalExpression(node.expression))
-        ? transformCondition(path.get("expression"), info.componentChild)
+        ? transformCondition(path.get("expression") as NodePath, info.componentChild)
         : !info.componentChild &&
           (config.generate !== "ssr" || info.fragmentChild) &&
           t.isCallExpression(node.expression) &&
@@ -161,7 +163,7 @@ export function transformElement(config, path, info = {}) {
   if (isComponent(tagName)) return transformComponent(path);
 
   // <div ...></div>
-  // const element = getTransformElemet(config, path, tagName);
+  // const element = getTransformElement(config, path, tagName);
 
   let tagRenderer;
   for (var renderer of config.renderers ?? []) {

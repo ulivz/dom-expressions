@@ -1,5 +1,6 @@
-import * as t from "@babel/types";
+import { t } from "babel-shared";
 import { addNamed } from "@babel/helper-module-imports";
+import type { NodePath, PluginOptions } from "../types";
 
 export const reservedNameSpaces = new Set([
   "class",
@@ -19,20 +20,21 @@ export const nonSpreadNameSpaces = new Set([
   "attr"
 ]);
 
-export function getConfig(path) {
-  return path.hub.file.metadata.config;
+export function getConfig(path: NodePath) {
+  return path.hub.file.metadata.config as PluginOptions;
 }
 
-export const getRendererConfig = (path, renderer) => {
+export const getRendererConfig = (path: NodePath, renderer: string) => {
   const config = getConfig(path);
   return config?.renderers?.find(r => r.name === renderer) ?? config;
 };
 
-export function registerImportMethod(path, name, moduleName) {
-  const imports =
+export function registerImportMethod(path: NodePath, name: string, moduleName: string) {
+  const imports: Map<string, string> =
     path.scope.getProgramParent().data.imports ||
     (path.scope.getProgramParent().data.imports = new Map());
   moduleName = moduleName || getConfig(path).moduleName;
+  
   if (!imports.has(`${moduleName}:${name}`)) {
     let id = addNamed(path, name, moduleName, {
       nameHint: `_$${name}`
@@ -48,7 +50,9 @@ export function registerImportMethod(path, name, moduleName) {
   }
 }
 
-function jsxElementNameToString(node) {
+function jsxElementNameToString(node: 
+    t.JSXIdentifier | t.JSXMemberExpression | t.JSXNamespacedName
+) {
   if (t.isJSXMemberExpression(node)) {
     return `${jsxElementNameToString(node.object)}.${node.property.name}`;
   }
@@ -58,7 +62,7 @@ function jsxElementNameToString(node) {
   return `${node.namespace.name}:${node.name.name}`;
 }
 
-export function tagNameToIdentifier(name) {
+export function tagNameToIdentifier(name: string) {
   const parts = name.split(".");
   if (parts.length === 1) return t.identifier(name);
   let part;
@@ -69,7 +73,7 @@ export function tagNameToIdentifier(name) {
   return base;
 }
 
-export function getTagName(tag) {
+export function getTagName(tag: t.JSXElement) {
   const jsxName = tag.openingElement.name;
   return jsxElementNameToString(jsxName);
 }
@@ -82,7 +86,17 @@ export function isComponent(tagName) {
   );
 }
 
-export function isDynamic(path, { checkMember, checkTags, checkCallExpressions = true, native }) {
+export function isDynamic(path: NodePath, { 
+  checkMember, 
+  checkTags, 
+  checkCallExpressions = true, 
+  native
+}: {
+  checkMember?: boolean;
+  checkTags: boolean;
+  checkCallExpressions?: boolean;
+  native?: boolean;
+}) {
   const config = getConfig(path);
   if (config.generate === "ssr" && native) {
     checkMember = false;
@@ -109,11 +123,11 @@ export function isDynamic(path, { checkMember, checkTags, checkCallExpressions =
   )
     return true;
 
-  let dynamic;
+  let dynamic: boolean;
   path.traverse({
     Function(p) {
       if (t.isObjectMethod(p.node) && p.node.computed) {
-        dynamic = isDynamic(p.get("key"), { checkMember, checkTags, checkCallExpressions, native });
+        dynamic = isDynamic(p.get("key") as NodePath, { checkMember, checkTags, checkCallExpressions, native });
       }
       p.skip();
     },
@@ -145,15 +159,15 @@ export function isDynamic(path, { checkMember, checkTags, checkCallExpressions =
   return dynamic;
 }
 
-export function getStaticExpression(path) {
+export function getStaticExpression(path: NodePath) {
   const node = path.node;
-  let value, type;
+  let value: any, type: string | number;
   return (
     t.isJSXExpressionContainer(node) &&
     t.isJSXElement(path.parent) &&
     !isComponent(getTagName(path.parent)) &&
     !t.isSequenceExpression(node.expression) &&
-    (value = path.get("expression").evaluate().value) !== undefined &&
+    (value = (path.get("expression") as NodePath).evaluate().value) !== undefined &&
     ((type = typeof value) === "string" || type === "number") &&
     value
   );
@@ -226,7 +240,7 @@ export function wrappedByText(list, startIndex) {
   return false;
 }
 
-export function transformCondition(path, inline, deep) {
+export function transformCondition(path: NodePath, inline, deep) {
   const config = getConfig(path);
   const expr = path.node;
   const memo = registerImportMethod(path, config.memoWrapper);
@@ -300,11 +314,11 @@ export function transformCondition(path, inline, deep) {
   return deep ? expr : t.arrowFunctionExpression([], expr);
 }
 
-export function escapeBackticks(value) {
+export function escapeBackticks(value:string): string {
   return value.replace(/`/g, "\\`");
 }
 
-export function escapeHTML(s, attr) {
+export function escapeHTML(s: unknown, attr?: boolean) {
   if (typeof s !== "string") return s;
   const delim = attr ? '"' : "<";
   const escDelim = attr ? "&quot;" : "&lt;";
@@ -349,9 +363,10 @@ export function escapeHTML(s, attr) {
   return left < s.length ? out + s.substring(left) : out;
 }
 
-export function convertJSXIdentifier(node) {
+export function convertJSXIdentifier(node: t.JSXIdentifier | t.JSXMemberExpression | t.JSXNamespacedName) {
   if (t.isJSXIdentifier(node)) {
     if (t.isValidIdentifier(node.name)) {
+      // @ts-expect-error
       node.type = "Identifier";
     } else {
       return t.stringLiteral(node.name);
@@ -368,7 +383,7 @@ export function convertJSXIdentifier(node) {
   return node;
 }
 
-export function canNativeSpread(key, { checkNameSpaces } = {}) {
+export function canNativeSpread(key: string, { checkNameSpaces } = {}) {
   if (checkNameSpaces && key.includes(":") && nonSpreadNameSpaces.has(key.split(":")[0])) return false;
   // TODO: figure out how to detect definitely function ref
   if (key === "ref") return false;
