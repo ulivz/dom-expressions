@@ -1,0 +1,12 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Convert JSX 1. unknown plugin: 1. unknown plugin 1`] = `
+
+attributeExpressions
+
+      ↓ ↓ ↓ ↓ ↓ ↓
+
+attributeExpressions;
+
+
+`;

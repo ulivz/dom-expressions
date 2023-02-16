@@ -33,6 +33,9 @@ export function registerImportMethod(path, name, moduleName) {
     path.scope.getProgramParent().data.imports ||
     (path.scope.getProgramParent().data.imports = new Map());
   moduleName = moduleName || getConfig(path).moduleName;
+  console.log('imports', imports);
+  console.log('`${moduleName}:${name}`', `${moduleName}:${name}`);
+  
   if (!imports.has(`${moduleName}:${name}`)) {
     let id = addNamed(path, name, moduleName, {
       nameHint: `_$${name}`
@@ -41,6 +44,8 @@ export function registerImportMethod(path, name, moduleName) {
     return id;
   } else {
     let iden = imports.get(`${moduleName}:${name}`);
+    console.log('iden', iden);
+    
     // the cloning is required to play well with babel-preset-env which is
     // transpiling import as we add them and using the same identifier causes
     // problems with the multiple identifiers of the same thing

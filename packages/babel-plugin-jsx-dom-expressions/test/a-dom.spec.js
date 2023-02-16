@@ -12,9 +12,8 @@ pluginTester({
     contextToCustomElements: true,
     staticMarker: "@once",
     requireImportSource: false,
-    
   },
   title: 'Convert JSX',
-  fixtures: path.join(__dirname, '__dom_fixtures__'),
+  fixtures: path.join(__dirname, '__a_dom_fixtures__'),
   snapshot: true,
 });

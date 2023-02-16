@@ -16,5 +16,6 @@ export default {
     format: "cjs",
     exports: "auto"
   },
+  sourcemap: true,
   plugins
 };

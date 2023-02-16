@@ -1,0 +1,1 @@
+const template5 = <div class="a" className="b"></div>;
