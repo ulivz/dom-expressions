@@ -129,7 +129,7 @@ export function transformNode(path: NodePath, info: TransformInfo = {}) {
     };
   } else if (t.isJSXSpreadChild(node)) {
     if (
-      !isDynamic(path.get("expression"), {
+      !isDynamic(path.get("expression") as NodePath, {
         checkMember: true,
         native: !info.componentChild
       })

@@ -1,4 +1,4 @@
-import { NodePath, TransformResult, TransformInfo, t } from "../types";
+import { NodePath, TransformResult, TransformInfo } from "../types";
 import { decode } from "html-entities";
 import {
   Aliases,

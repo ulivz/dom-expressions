@@ -32,7 +32,7 @@ export const getRendererConfig = (path: NodePath, renderer: string) => {
 export function registerImportMethod(path: NodePath, name: string, moduleName: string) {
   const imports: Map<string, string> =
     path.scope.getProgramParent().data.imports ||
-    (path.scope.getProgramParent().data.imports = new Map());
+    (path.scope.getProgramParent().data.imports = new Map<string, string>());
   moduleName = moduleName || getConfig(path).moduleName;
   
   if (!imports.has(`${moduleName}:${name}`)) {
@@ -93,7 +93,7 @@ export function isDynamic(path: NodePath, {
   native
 }: {
   checkMember?: boolean;
-  checkTags: boolean;
+  checkTags?: boolean;
   checkCallExpressions?: boolean;
   native?: boolean;
 }) {
@@ -159,7 +159,7 @@ export function isDynamic(path: NodePath, {
   return dynamic;
 }
 
-export function getStaticExpression(path: NodePath) {
+export function getStaticExpression(path: NodePath): string | number {
   const node = path.node;
   let value: any, type: string | number;
   return (
@@ -205,15 +205,15 @@ export function trimWhitespace(text) {
   return text.replace(/\s+/g, " ");
 }
 
-export function toEventName(name) {
+export function toEventName(name: string) {
   return name.slice(2).toLowerCase();
 }
 
-export function toAttributeName(name) {
+export function toAttributeName(name: string) {
   return name.replace(/([A-Z])/g, g => `-${g[0].toLowerCase()}`);
 }
 
-export function toPropertyName(name) {
+export function toPropertyName(name: string) {
   return name.toLowerCase().replace(/-([a-z])/g, (_, w) => w.toUpperCase());
 }
 
@@ -240,7 +240,7 @@ export function wrappedByText(list, startIndex) {
   return false;
 }
 
-export function transformCondition(path: NodePath, inline, deep) {
+export function transformCondition(path: NodePath, inline: boolean, deep?: boolean) {
   const config = getConfig(path);
   const expr = path.node;
   const memo = registerImportMethod(path, config.memoWrapper);

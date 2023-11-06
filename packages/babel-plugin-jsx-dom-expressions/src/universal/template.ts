@@ -1,8 +1,9 @@
 import * as t from "@babel/types";
 import { getConfig, registerImportMethod } from "../shared/utils";
 import { setAttr } from "./element";
+import { NodePath, TransformResult } from "../types";
 
-export function createTemplate(path, result, wrap) {
+export function createTemplate(path: NodePath, result: TransformResult, wrap) {
   const config = getConfig(path);
   if (result.id) {
     result.decl = t.variableDeclaration("const", result.decl);
@@ -34,7 +35,7 @@ export function createTemplate(path, result, wrap) {
   return result.exprs[0];
 }
 
-function wrapDynamics(path, dynamics) {
+function wrapDynamics(path: NodePath, dynamics: string[]) {
   if (!dynamics.length) return;
   const config = getConfig(path);
 

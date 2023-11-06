@@ -31,7 +31,7 @@ export type HTMLTag = {
 };
 
 const cache = new Map<TemplateStringsArray, HTMLTemplateElement[]>();
-// Based on https://github.com/WebReflection/domtagger/blob/master/esm/sanitizer.js
+// Based on https://github.com/WebReflection/domtagger/blob/master/index.js
 const VOID_ELEMENTS = /^(?:area|base|br|col|embed|hr|img|input|keygen|link|menuitem|meta|param|source|track|wbr)$/i;
 const spaces = " \\f\\n\\r\\t";
 const almostEverything = "[^ " + spaces + "\\/>\"'=]+";

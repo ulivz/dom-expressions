@@ -1,7 +1,8 @@
-import type { NodePath, t, VisitNode,
-  PluginPass } from "babeland";
+import type { NodePath,  VisitNode, PluginPass } from "babeland";
+import { t } from "babeland";
 
-export { NodePath, t };
+export { NodePath };
+export { t };
 
 export type JSXVisitNode = VisitNode<
   PluginPass<any> & {
@@ -22,7 +23,7 @@ export interface PluginOptions {
   effectWrapper: string;
   memoWrapper: string;
   validate: boolean;
-  renderers: Array<{
+  renderers?: Array<{
     name: string;
     elements: string[];
     moduleName: string;
@@ -33,7 +34,8 @@ export interface TransformResult {
   id?: t.Identifier;
   template?: string | string[];
   templateValues?: string[];
-  decl?: string[];
+  // 
+  decl?: any;
   exprs?: string[];
   dynamics?: string[];
   postExprs?: string[];
